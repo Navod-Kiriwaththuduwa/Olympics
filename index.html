@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leo Registration Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { padding: 10px; margin: 5px; }
+        table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+
+<h2>Search Leo Registration</h2>
+<input type="text" id="searchName" placeholder="Enter any part of a Name">
+<button onclick="search()">Search</button>
+
+<div id="result"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+let data = [];
+
+// Load CSV
+Papa.parse("Registrations.csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+        data = results.data;
+        console.log("CSV loaded:", data);
+    }
+});
+
+function search() {
+    const keyword = document.getElementById('searchName').value.trim().toLowerCase();
+    const output = document.getElementById('result');
+
+    if (!keyword) {
+        output.innerHTML = "<p>Please enter a name to search.</p>";
+        return;
+    }
+
+    const results = data.filter(d => d.Name && d.Name.toLowerCase().includes(keyword));
+    
+    if (results.length > 0) {
+        let html = '<table><tr>';
+        for (const key in results[0]) {
+            html += `<th>${key}</th>`;
+        }
+        html += '</tr>';
+
+        for (const row of results) {
+            html += '<tr>';
+            for (const key in row) {
+                html += `<td>${row[key] || '-'}</td>`;
+            }
+            html += '</tr>';
+        }
+
+        html += '</table>';
+        output.innerHTML = html;
+    } else {
+        output.innerHTML = "<p>No matching names found.</p>";
+    }
+}
+</script>
+
+</body>
+</html>
