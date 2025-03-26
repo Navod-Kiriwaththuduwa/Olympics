@@ -47,7 +47,7 @@ function search() {
 
     const results = data.filter(row => {
         const nameMatch = nameKeyword ? (row.Name && row.Name.toLowerCase().includes(nameKeyword)) : true;
-        const clubMatch = clubKeyword ? (row.Club && row.Club.toLowerCase().includes(clubKeyword)) : true;
+        const clubMatch = clubKeyword ? (row["Leo Club"] && row["Leo Club"].toLowerCase().includes(clubKeyword)) : true;
         const mylciMatch = mylciKeyword ? (row["MYLCI No"] && row["MYLCI No"].toLowerCase().includes(mylciKeyword)) : true;
         return nameMatch && clubMatch && mylciMatch;
     });
