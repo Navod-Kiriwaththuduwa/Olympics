@@ -4,7 +4,7 @@
     <title>Leo Registration Search</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
-        input, select, button { padding: 10px; margin: 5px; }
+        input, button { padding: 10px; margin: 5px; }
         table { border-collapse: collapse; margin-top: 20px; width: 100%; }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
         th { background-color: #f4f4f4; }
@@ -13,10 +13,10 @@
 <body>
 
 <h2>Search Leo Registration</h2>
-<input type="text" id="searchInput" placeholder="Enter keyword">
-<select id="columnSelect">
-    <option value="all">All Columns</option>
-</select>
+
+<input type="text" id="nameInput" placeholder="Name">
+<input type="text" id="clubInput" placeholder="Club">
+<input type="text" id="mylciInput" placeholder="MYLCI No">
 <button onclick="search()">Search</button>
 
 <div id="result"></div>
@@ -25,48 +25,32 @@
 <script>
 let data = [];
 
-// Load CSV
 Papa.parse("Registrations.csv", {
     download: true,
     header: true,
     complete: function(results) {
         data = results.data.filter(row => Object.values(row).some(cell => cell)); // Remove empty rows
         console.log("CSV loaded:", data);
-
-        // Populate column selector
-        const columnSelect = document.getElementById('columnSelect');
-        const headers = results.meta.fields;
-
-        headers.forEach(header => {
-            const option = document.createElement('option');
-            option.value = header;
-            option.textContent = header;
-            columnSelect.appendChild(option);
-        });
     }
 });
 
 function search() {
-    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-    const selectedColumn = document.getElementById('columnSelect').value;
+    const nameKeyword = document.getElementById('nameInput').value.trim().toLowerCase();
+    const clubKeyword = document.getElementById('clubInput').value.trim().toLowerCase();
+    const mylciKeyword = document.getElementById('mylciInput').value.trim().toLowerCase();
     const output = document.getElementById('result');
 
-    if (!keyword) {
-        output.innerHTML = "<p>Please enter a keyword to search.</p>";
+    if (!nameKeyword && !clubKeyword && !mylciKeyword) {
+        output.innerHTML = "<p>Please enter at least one search criteria.</p>";
         return;
     }
 
-    let results = [];
-
-    if (selectedColumn === 'all') {
-        results = data.filter(row =>
-            Object.values(row).some(val => val && val.toLowerCase().includes(keyword))
-        );
-    } else {
-        results = data.filter(row =>
-            row[selectedColumn] && row[selectedColumn].toLowerCase().includes(keyword)
-        );
-    }
+    const results = data.filter(row => {
+        const nameMatch = nameKeyword ? (row.Name && row.Name.toLowerCase().includes(nameKeyword)) : true;
+        const clubMatch = clubKeyword ? (row.Club && row.Club.toLowerCase().includes(clubKeyword)) : true;
+        const mylciMatch = mylciKeyword ? (row["MYLCI No"] && row["MYLCI No"].toLowerCase().includes(mylciKeyword)) : true;
+        return nameMatch && clubMatch && mylciMatch;
+    });
 
     if (results.length > 0) {
         let html = '<table><tr>';
